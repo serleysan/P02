@@ -1,0 +1,22 @@
+USE ElectroShop
+SELECT o.IDOrder AS "Номер заказа", c.ClientName + ' ' + c.ClientSurname AS Клиент, OrderDate AS "Дата заказа", s.StatusName AS "Статус", 
+od.IDOrderDetail AS "Номер детали заказа", od.Quantity AS Количество,
+p.ProductName AS "Продукт", SUM(p.Price * od.Quantity) AS Сумма
+FROM Orders o
+JOIN OrderDetails od ON o.IDOrder = od.IDOrder
+JOIN Clients c ON o.IDClient = c.IDClient
+JOIN Statuses s ON o.IDStatus = s.IDStatus
+JOIN Products p ON od.IDProduct = p.IDProduct
+GROUP BY o.IDOrder, c.ClientName, c.ClientSurname, o.OrderDate, s.StatusName, od.IDOrderDetail, p.ProductName, od.Quantity
+ORDER BY o.IDOrder, Сумма ASC;
+
+
+
+SELECT 
+    c.ClientSurname AS Client,
+    SUM(p.Price * od.Quantity) AS TotalSum
+FROM Orders o
+JOIN Clients c ON o.IDClient = c.IDClient
+JOIN OrderDetails od ON o.IDOrder = od.IDOrder
+JOIN Products p ON od.IDProduct = p.IDProduct
+GROUP BY c.ClientSurname;
