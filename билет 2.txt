@@ -1,0 +1,21 @@
+USE InternetShop
+SELECT ProductName, Price
+FROM Products
+ORDER BY Price ASC;
+
+SELECT o.IDOrder, c.ClientSurname + ' ' + c.ClientName + ' ' + c.ClientLastName  AS Client, s.StatusName, o.OrderDate
+FROM Orders o
+JOIN Clients c ON o.IDCLient = c.IDCLient
+JOIN Statuses s ON o.IDStatus = s.IDStatus
+WHERE s.StatusName IN ('в обработке', 'отправлен')
+ORDER BY o.OrderDate DESC;
+
+SELECT 
+    c.ClientSurname AS Client,
+    SUM(p.Price) AS TotalSum
+FROM Orders o
+JOIN Clients c ON o.IDClient = c.IDClient
+JOIN Products p ON o.IDProduct = p.IDProduct
+GROUP BY c.ClientSurname;
+
+
