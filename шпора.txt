@@ -1,0 +1,113 @@
+SQL Шпаргалка для квалификационного экзамена
+(универсальная по любым запросам)
+
+SELECT [столбцы]
+FROM [таблица]
+[JOIN другая_таблица ON условие]
+[WHERE условие_отбора]
+[GROUP BY столбцы]
+[ORDER BY столбцы [ASC|DESC]];
+
+
+Пояснения:
+•	SELECT — какие данные выводим
+•	FROM — из какой таблицы
+•	JOIN — соединяем с другими таблицами
+•	WHERE — фильтруем
+•	GROUP BY — группируем
+•	ORDER BY — сортируем по возрастанию (ASC) или убыванию (DESC)
+•	2.  Виды JOIN и как использовать
+Тип	Что делает	Пример
+INNER JOIN	выводит только совпадающие записи	JOIN Clients c ON o.IDClient = c.IDClient
+LEFT JOIN	берёт все из левой таблицы, даже без совпадений	LEFT JOIN Products p ON o.IDProduct = p.IDProduct
+RIGHT JOIN	берёт все из правой таблицы	редко используется
+FULL JOIN	объединяет всё (и совпавшие, и нет)	редко используется
+
+•	3.  WHERE — фильтрация данных
+SELECT *
+FROM Products
+WHERE Price > 1000;
+-- Несколько условий
+WHERE Price > 1000 AND Category = 'Техника';
+
+-- Фильтр по набору значений
+WHERE StatusName IN ('в обработке', 'отправлен');
+
+-- Частичное совпадение
+WHERE ProductName LIKE '%ноутбук%';
+
+
+•	4.  ORDER BY — сортировка
+
+-- По возрастанию цены
+ORDER BY Price ASC;
+
+-- По убыванию даты
+ORDER BY OrderDate DESC;
+
+-- По нескольким полям
+ORDER BY ClientSurname ASC, OrderDate DESC;
+
+
+•	5.  Примеры JOIN-запросов с заменой ключей на имена
+-- Все заказы с именами клиентов и статусами
+SELECT 
+    o.IDOrder, 
+    c.ClientSurname + ' ' + c.ClientName + ' ' + c.ClientLastName AS Client,
+    s.StatusName,
+    o.OrderDate
+FROM Orders o
+JOIN Clients c ON o.IDClient = c.IDClient
+JOIN Statuses s ON o.IDStatus = s.IDStatus
+ORDER BY o.OrderDate DESC;
+
+•	6.  Группировка и агрегатные функции
+
+Функция	Что делает
+SUM()	сумма
+AVG()	среднее
+COUNT()	количество
+MAX()	максимум
+MIN()	минимум
+
+-- Сумма всех цен
+SELECT SUM(Price) AS TotalSum FROM Products;
+
+-- Средняя цена товаров
+SELECT AVG(Price) AS AvgPrice FROM Products;
+
+-- Количество заказов по каждому клиенту
+SELECT c.ClientSurname, COUNT(o.IDOrder) AS OrderCount
+FROM Orders o
+JOIN Clients c ON o.IDClient = c.IDClient
+GROUP BY c.ClientSurname;
+
+•	7.  Пример запроса с группировкой по клиенту
+-- Общая сумма заказов по каждому клиенту
+SELECT 
+    c.ClientSurname AS Client,
+    SUM(p.Price) AS TotalSum
+FROM Orders o
+JOIN Clients c ON o.IDClient = c.IDClient
+JOIN Products p ON o.IDProduct = p.IDProduct
+GROUP BY c.ClientSurname;
+
+Если у тебя таблица OrderDetails (несколько товаров в заказ
+SELECT 
+    c.ClientSurname AS Client,
+    SUM(p.Price * od.Quantity) AS TotalSum
+FROM Orders o
+JOIN Clients c ON o.IDClient = c.IDClient
+JOIN OrderDetails od ON o.IDOrder = od.IDOrder
+JOIN Products p ON od.IDProduct = p.IDProduct
+GROUP BY c.ClientSurname;
+
+•	8.  Часто нужные приёмы
+Цель	Пример
+Вывести уникальные значения	SELECT DISTINCT StatusName FROM Statuses;
+Переименовать столбец	AS НовыйПсевдоним
+Объединить текст	ClientSurname + ' ' + ClientName
+Ограничить количество строк	SELECT TOP 10 * FROM Products;
+Проверить наличие NULL	WHERE Phone IS NULL или IS NOT NULL
+
+
